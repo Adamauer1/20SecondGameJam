@@ -25,6 +25,7 @@ namespace _Scripts
         [SerializeField] private float m_badWindow = 0.3f;       
         
         [SerializeField] private SpriteRenderer m_rhythmRenderer;
+        [SerializeField] private SpriteRenderer m_rhythmErrorLight;
         private Color m_baseColor = Color.white;
         private Color m_cueFlashColor = Color.gray;
 
@@ -32,6 +33,8 @@ namespace _Scripts
         private int m_nextPlayerEvent = 0;
         private float m_flashDuration = 0.1f;
         private float m_flashTimer = 0.0f;
+        private float m_flashErrorDuration = 0.1f;
+        private float m_flashErrorTimer = 0.0f;
 
 
         private List<RhythmEvent> m_rhythmEvents = new List<RhythmEvent>();
@@ -43,9 +46,9 @@ namespace _Scripts
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 0f, BeatType = "Cue"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 1f, BeatType = "Cue"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 2f, BeatType = "Cue"} );
-            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 3f, BeatType = "Press"} );
-            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 4f, BeatType = "Cue"} );
-            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 5f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 3f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 4f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 5f, BeatType = "Press"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 6f, BeatType = "Press"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 7f, BeatType = "Press"} );
 
@@ -62,12 +65,18 @@ namespace _Scripts
 
         private void Update()
         {
+            Debug.Log(m_beatClock.CurrentBeat);
             if (m_flashTimer > 0f)
             {
                 m_flashTimer -= Time.deltaTime;
                 if (m_flashTimer <= 0f) m_rhythmRenderer.color = m_baseColor;
             }
-            
+
+            if (m_flashErrorTimer > 0f)
+            {
+                m_flashErrorTimer -= Time.deltaTime;
+                if (m_flashErrorTimer <= 0f) m_rhythmErrorLight.color = Color.white;
+            }
             
             if (m_nextPlayerEvent >= m_playerEvents.Count) return;
             
@@ -78,11 +87,15 @@ namespace _Scripts
                 if (beat - m_rhythmEvents[m_eventIndex].BeatCount > m_badWindow)
                 {
                     Debug.Log("MISS");
-                    m_rhythmRenderer.color = Color.red;
-                    m_flashTimer = m_flashDuration;
+                    m_rhythmErrorLight.color = Color.red;
+                    m_flashErrorTimer = m_flashErrorDuration;
                     m_nextPlayerEvent++;
                 }
-                ExecuteEvent(m_rhythmEvents[m_eventIndex]);
+
+                if (m_rhythmEvents[m_eventIndex].BeatType == "Cue")
+                {
+                    ExecuteEvent(m_rhythmEvents[m_eventIndex]);   
+                }
                 //m_rhythmRenderer.color = Color.white; 
                 m_eventIndex++;
             }
@@ -92,11 +105,11 @@ namespace _Scripts
 
         private void ExecuteEvent(RhythmEvent rhythmEvent)
         {
-            if (rhythmEvent.BeatType == "Cue")
-            {
-                m_rhythmRenderer.color = Color.gray;    
-                m_flashTimer = m_flashDuration;
-            }
+            //if (rhythmEvent.BeatType == "Cue")
+            //{
+            m_rhythmRenderer.color = Color.gray;    
+            m_flashTimer = m_flashDuration;
+            //}
             m_rhythmSource.PlayOneShot(m_rhythmClip);
             Debug.Log($"Event triggered at beat {rhythmEvent.BeatCount}: {rhythmEvent.BeatType}");
         }
@@ -119,6 +132,7 @@ namespace _Scripts
             
             float absolutePlayerError = Mathf.Abs(playerError);
             JudgePlayerError(absolutePlayerError);
+            ExecuteEvent(target);
             m_nextPlayerEvent++;
             
             // Debug.Log($"Button clicked");
@@ -129,24 +143,24 @@ namespace _Scripts
             if (absolutePlayerError <= m_perfectWindow)
             {
                 Debug.Log("PERFECT");
-                m_rhythmRenderer.color = Color.green; 
+                m_rhythmErrorLight.color = Color.green; 
             }
             else if (absolutePlayerError <= m_goodWindow)
             {
                 Debug.Log("GOOD");
-                m_rhythmRenderer.color = Color.yellow; 
+                m_rhythmErrorLight.color = Color.yellow; 
             }
             else if (absolutePlayerError <= m_badWindow)
             {
                 Debug.Log("BAD");
-                m_rhythmRenderer.color = Color.red; 
+                m_rhythmErrorLight.color = Color.red; 
             }
             else
             {
                 Debug.Log("MISS");
-                m_rhythmRenderer.color = Color.red;
+                m_rhythmErrorLight.color = Color.red;
             }
-            m_flashTimer =  m_flashDuration;
+            m_flashErrorTimer =  m_flashErrorDuration;
         }
 
     }

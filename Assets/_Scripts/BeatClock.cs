@@ -7,7 +7,7 @@ namespace _Scripts
     {
         //public static BeatClock Instance { get; private set; }
 
-        [SerializeField] private float m_bpm = 120f;
+        [SerializeField] private float m_bpm = 80f;
 
         [SerializeField] private int m_beatsPerMeasure = 4;
         [SerializeField] private int m_beatUnit = 4;
