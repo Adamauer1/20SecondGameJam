@@ -14,6 +14,7 @@ namespace _Scripts
         
         private double m_dspStart;
         private float m_secondsPerBeat;
+        private bool m_isPlaying = false;
         
         // public float CurrentBeat => (float)((AudioSettings.dspTime - m_dspStart) / m_secondsPerBeat);
         public float CurrentBeat { get; private set; }
@@ -29,15 +30,36 @@ namespace _Scripts
 
         private void Start()
         {
-            m_secondsPerBeat = 60 / m_bpm;
-            m_dspStart = AudioSettings.dspTime;
+            // m_secondsPerBeat = 60 / m_bpm;
+            // m_dspStart = AudioSettings.dspTime;
             
         }
 
         private void Update()
         {
+            if (!m_isPlaying)
+            {
+                return;
+            }
             double eslapse = AudioSettings.dspTime - m_dspStart;
             CurrentBeat = (float) (eslapse / m_secondsPerBeat);
+        }
+        
+        public void StartClock()
+        {
+            // m_secondsPerBeat = 60 / m_bpm;
+            m_dspStart = AudioSettings.dspTime;
+            m_isPlaying = true;
+        }
+
+        public void StopClock()
+        {
+            m_isPlaying = false;
+        }
+
+        public bool GetIsPlaying()
+        {
+            return m_isPlaying;
         }
     }
 }

@@ -51,6 +51,27 @@ namespace _Scripts
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 5f, BeatType = "Press"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 6f, BeatType = "Press"} );
             m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 7f, BeatType = "Press"} );
+            
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 10f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 11f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 13f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 14f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 15f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 17f, BeatType = "Press"} );
+            
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 20f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 20.25f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 21f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 22f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 22.25f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 23f, BeatType = "Cue"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 24f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 24.25f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 25f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 26f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 26.25f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 27f, BeatType = "Press"} );
+            m_rhythmEvents.Add(new RhythmEvent{ BeatCount = 28f, BeatType = "End"} );
 
             GameInput.Instance.OnButtonClicked += GameInput_OnButtonClicked;
 
@@ -84,17 +105,20 @@ namespace _Scripts
             //Debug.Log(beat);
             while (m_eventIndex < m_rhythmEvents.Count && m_rhythmEvents[m_eventIndex].BeatCount <= beat)
             {
-                if (beat - m_rhythmEvents[m_eventIndex].BeatCount > m_badWindow)
+                if (beat - m_playerEvents[m_nextPlayerEvent].BeatCount > m_badWindow)
                 {
                     Debug.Log("MISS");
-                    m_rhythmErrorLight.color = Color.red;
-                    m_flashErrorTimer = m_flashErrorDuration;
+                    // m_rhythmErrorLight.color = Color.red;
+                    // m_flashErrorTimer = m_flashErrorDuration;
                     m_nextPlayerEvent++;
                 }
-
                 if (m_rhythmEvents[m_eventIndex].BeatType == "Cue")
                 {
                     ExecuteEvent(m_rhythmEvents[m_eventIndex]);   
+                }
+                else if (m_rhythmEvents[m_eventIndex].BeatType == "End")
+                {
+                    m_beatClock.StopClock();   
                 }
                 //m_rhythmRenderer.color = Color.white; 
                 m_eventIndex++;
@@ -116,6 +140,12 @@ namespace _Scripts
 
         private void GameInput_OnButtonClicked(object sender, EventArgs eventArgs)
         {
+            if (!m_beatClock.GetIsPlaying())
+            {
+                m_beatClock.StartClock();
+                return;
+            }
+            
             if (m_nextPlayerEvent >= m_playerEvents.Count)
             {
                 return;
