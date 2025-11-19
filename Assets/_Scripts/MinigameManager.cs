@@ -169,6 +169,8 @@ namespace _Scripts
                 return;
             }
             
+            
+            
             if (m_nextPlayerEvent >= m_playerEvents.Count)
             {
                 return;
@@ -176,6 +178,7 @@ namespace _Scripts
             
             float beat = m_beatClock.CurrentBeat;
             RhythmEvent target = m_playerEvents[m_nextPlayerEvent];
+            ExecuteEvent(target);
             float playerError = beat - target.BeatCount;
 
             if (playerError < -m_badWindow)
@@ -185,7 +188,7 @@ namespace _Scripts
             
             float absolutePlayerError = Mathf.Abs(playerError);
             JudgePlayerError(absolutePlayerError);
-            ExecuteEvent(target);
+            // ExecuteEvent(target);
             m_nextPlayerEvent++;
             
             // Debug.Log($"Button clicked");
